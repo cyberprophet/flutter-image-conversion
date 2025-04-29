@@ -1,0 +1,67 @@
+import Flutter
+import UIKit
+
+public class FlutterImageConversionPlugin: NSObject, FlutterPlugin {
+  public static func register(with registrar: FlutterPluginRegistrar) {
+    let channel = FlutterMethodChannel(name: "flutter_image_conversion", binaryMessenger: registrar.messenger())
+    let instance = FlutterImageConversionPlugin()
+    registrar.addMethodCallDelegate(instance, channel: channel)
+  }
+
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+
+    case "getPlatformVersion":
+      result("iOS " + UIDevice.current.systemVersion)
+
+    case "convertHeicToJpeg":
+      let args = call.arguments as? [String: Any],
+      let path = args["path"] as? String {
+
+      let url = URL(fileURLWithPath: path)
+
+      guard let image = UIImage(contentsOfFile: url.path),
+            let resizedImage = resizeImageIfNeeded(image, maxWidth: 1080),
+            let jpegData = resizedImage.jpegData(compressionQuality: 0.7) else {
+
+        result(FlutterError(code: "IMAGE_PROCESSING_FAILED", message: "Failed to process image", details: nil))
+    
+        return
+      }
+
+      let tempDir = NSTemporaryDirectory()
+      let outputPath = "\(tempDir)/converted_\(UUID().uuidString).jpg"
+      let outputURL = URL(fileURLWithPath: outputPath)
+
+      do {
+        try jpegData.write(to: outputURL)
+
+        result(outputPath)
+      } catch {
+        result(nil)
+      }
+
+    default:
+      result(FlutterMethodNotImplemented)
+    }
+  }
+
+  private func resizeImageIfNeeded(image: UIImage, maxWidth: CGFloat) -> UIImage? {
+    let size = image.size
+
+    guard size.width > maxWidth else { return image }
+
+    let scale = maxWidth / size.width
+    let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+
+    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+
+    image.draw(in: CGRect(origin: .zero, size: newSize))
+
+    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+    
+    UIGraphicsEndImageContext()
+
+    return resizedImage
+  }
+}
