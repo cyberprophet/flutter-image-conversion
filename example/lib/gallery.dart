@@ -79,9 +79,16 @@ class _GalleryState extends State<Gallery> {
             builder: (_, snapshot) => snapshot.hasData
                 ? FutureBuilder(
                     future: _imgConvert.convertHeicToJpeg(snapshot.data!),
-                    builder: (_, snapshot) => snapshot.hasData
-                        ? Image.file(snapshot.data!)
-                        : const SizedBox.shrink(),
+                    builder: (_, snapshot) {
+                      if (snapshot.hasData) {
+                        if (kDebugMode) {
+                          print({'path': snapshot.data?.path});
+                        }
+                      }
+                      return snapshot.hasData
+                          ? Image.file(snapshot.data!)
+                          : const SizedBox.shrink();
+                    },
                   )
                 : const SizedBox.shrink(),
           ),

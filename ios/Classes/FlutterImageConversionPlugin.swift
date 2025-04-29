@@ -10,22 +10,26 @@ public class FlutterImageConversionPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
-
     case "getPlatformVersion":
       result("iOS " + UIDevice.current.systemVersion)
 
     case "convertHeicToJpeg":
-      let args = call.arguments as? [String: Any],
-      let path = args["path"] as? String {
+      guard
+        let args = call.arguments as? [String: Any],
+        let path = args["path"] as? String
+      else {
+        result(nil)
+        return
+      }
 
       let url = URL(fileURLWithPath: path)
 
       guard let image = UIImage(contentsOfFile: url.path),
-            let resizedImage = resizeImageIfNeeded(image, maxWidth: 1080),
-            let jpegData = resizedImage.jpegData(compressionQuality: 0.7) else {
-
+            let resizedImage = resizeImageIfNeeded(image: image, maxWidth: 1080),
+            let jpegData = resizedImage.jpegData(compressionQuality: 0.7)
+      else {
         result(FlutterError(code: "IMAGE_PROCESSING_FAILED", message: "Failed to process image", details: nil))
-    
+
         return
       }
 
@@ -59,7 +63,7 @@ public class FlutterImageConversionPlugin: NSObject, FlutterPlugin {
     image.draw(in: CGRect(origin: .zero, size: newSize))
 
     let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-    
+
     UIGraphicsEndImageContext()
 
     return resizedImage
