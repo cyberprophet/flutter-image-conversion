@@ -1,3 +1,27 @@
+## 2.1.2
+
+**Patch Release: Fix Web Bytes Conversion Bug**
+
+### Bug Fixes
+- 🐛 Fixed `convertHeicToJpegBytes()` on Web platform
+  - Corrected FileReader.result type handling (ByteBuffer → Uint8List)
+  - Added MIME type to Blob constructor for better heic2any compatibility
+  - Fixed HEIC file detection using proper ISO-BMFF ftyp box parsing
+  - Improved error handling with FileReader.onLoadEnd
+
+### Example App
+- ✨ Added test button for `convertHeicToJpegBytes()` method
+  - Displays converted bytes size and hex preview
+  - Helps verify Web platform functionality
+
+### Technical Details
+- Fixed bug where `reader.result as List<int>` failed (should be `ByteBuffer`)
+- Changed Blob creation from `Blob([bytes])` to `Blob(<Object>[bytes], 'image/heic')`
+- Replaced broken magic bytes check with proper ISO Base Media File Format parsing
+- Now checks ftyp box at correct offset (4) and validates HEIF brand codes
+
+---
+
 ## 2.1.1
 
 **Patch Release: Fix pub.dev Deployment**

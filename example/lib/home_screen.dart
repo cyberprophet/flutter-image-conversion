@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   File? _selectedFile;
   File? _convertedFile;
   bool _isConverting = false;
+  Uint8List? _convertedBytes;
+  bool _isConvertingBytes = false;
   String? _error;
 
   Future<void> _pickFile() async {
@@ -45,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _selectedPlatformFile = platformFile;
         _selectedFile = file;
         _convertedFile = null;
+        _convertedBytes = null;
         _error = null;
       });
     } catch (e) {
@@ -92,6 +95,45 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _convertBytes() async {
+    final platformFile = _selectedPlatformFile;
+    if (platformFile == null || platformFile.bytes == null) {
+      setState(() {
+        _error = 'No file bytes available';
+      });
+      return;
+    }
+
+    setState(() {
+      _isConvertingBytes = true;
+      _error = null;
+    });
+
+    try {
+      final inputBytes = platformFile.bytes!;
+      final converted = await _converter.convertHeicToJpegBytes(inputBytes);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _convertedBytes = converted;
+      });
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = e.toString();
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isConvertingBytes = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -125,6 +167,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   : const Text('Convert to JPEG'),
             ),
+            const SizedBox(height: 8),
+            FilledButton.tonal(
+              onPressed:
+                  _selectedPlatformFile == null ||
+                      _selectedPlatformFile!.bytes == null ||
+                      _isConvertingBytes
+                  ? null
+                  : _convertBytes,
+              child: _isConvertingBytes
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Convert to JPEG (Bytes)'),
+            ),
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(
@@ -138,6 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _previewSection('Original', _selectedFile),
             const SizedBox(height: 16),
             _previewSection('Converted', _convertedFile),
+            const SizedBox(height: 16),
+            if (_convertedBytes != null) _bytesInfoCard(theme),
           ],
         ),
       ),
@@ -212,5 +272,46 @@ class _HomeScreenState extends State<HomeScreen> {
       unit++;
     }
     return '${size.toStringAsFixed(1)} ${units[unit]}';
+  }
+
+  Widget _bytesInfoCard(ThemeData theme) {
+    final bytes = _convertedBytes!;
+    final hexPreview = bytes
+        .take(32)
+        .map((b) => b.toRadixString(16).padLeft(2, '0'))
+        .join(' ');
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Converted Bytes Result', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            _infoRow('Size', _formatBytes(bytes.length)),
+            _infoRow('Format', 'Uint8List'),
+            const SizedBox(height: 8),
+            Text('First 32 bytes (hex):', style: theme.textTheme.bodySmall),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                hexPreview,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
