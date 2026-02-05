@@ -1,0 +1,29 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Set up pub credentials
+        run: |
+          mkdir -p "$HOME/.pub-cache"
+          echo '${{ secrets.PUB_CREDENTIALS }}' > "$HOME/.pub-cache/credentials.json"
+
+      - name: Publish
+        run: flutter pub publish --force
