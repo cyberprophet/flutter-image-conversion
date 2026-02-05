@@ -45,11 +45,5 @@
         <true />
         <key>UIApplicationSupportsIndirectInputEvents</key>
         <true />
-        <key>NSCameraUsageDescription</key>
-        <string>We need access to your camera to take photos.</string>
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>You must agree with the photo album to see your pictures</string>
-        <key>NSPhotoLibraryAddUsageDescription</key>
-        <string>You must agree the additions permission to save assets.</string>
     </dict>
 </plist>
