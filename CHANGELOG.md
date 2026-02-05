@@ -1,3 +1,27 @@
+## 2.1.0
+
+**New Feature: Uint8List-Based Conversion Method**
+
+### New Features
+- ✅ **convertHeicToJpegBytes()**: New method for direct Uint8List conversion
+  - Accepts `Uint8List` input instead of `File`
+  - Returns `Uint8List` output instead of `File`
+  - Improved Web platform support (avoids File/blob URL handling issues)
+  - Available on iOS, macOS, and Web platforms
+  - Android and Windows return original bytes unchanged
+
+### Improvements
+- Better support for in-memory image processing workflows
+- Reduced file I/O overhead for Web platform
+- Cleaner API for applications that work with byte arrays
+
+### Backward Compatibility
+- ✅ Existing `convertHeicToJpeg(File)` method unchanged
+- ✅ All existing code continues to work without modifications
+- ✅ No breaking changes
+
+---
+
 ## 2.0.0
 
 **Major Update: Multi-Platform Support**
