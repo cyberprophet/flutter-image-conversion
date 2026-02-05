@@ -1,3 +1,19 @@
+## 2.1.1
+
+**Patch Release: Fix pub.dev Deployment**
+
+### Changes
+- 🔧 Fixed GitHub Actions workflow for pub.dev deployment
+  - Added OIDC authentication setup
+  - Updated tag pattern for more specific matching
+  - Improved workflow configuration
+
+### Notes
+- No code changes - deployment infrastructure update only
+- Same functionality as v2.1.0
+
+---
+
 ## 2.1.0
 
 **New Feature: Uint8List-Based Conversion Method**
