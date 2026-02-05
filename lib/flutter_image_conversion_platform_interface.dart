@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -31,4 +32,6 @@ abstract class FlutterImageConversionPlatform extends PlatformInterface {
   }
 
   Future<File> convertHeicToJpeg(File file);
+
+  Future<Uint8List> convertHeicToJpegBytes(Uint8List bytes);
 }

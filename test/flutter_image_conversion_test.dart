@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_image_conversion/flutter_image_conversion.dart';
 import 'package:flutter_image_conversion/flutter_image_conversion_method_channel.dart';
@@ -14,6 +15,10 @@ class MockFlutterImageConversionPlatform
 
   @override
   Future<File> convertHeicToJpeg(File file) => Future.value(File('path'));
+
+  @override
+  Future<Uint8List> convertHeicToJpegBytes(Uint8List bytes) =>
+      Future.value(bytes);
 }
 
 void main() {
@@ -22,7 +27,9 @@ void main() {
 
   test('$MethodChannelFlutterImageConversion is the default instance', () {
     expect(
-        initialPlatform, isInstanceOf<MethodChannelFlutterImageConversion>());
+      initialPlatform,
+      isInstanceOf<MethodChannelFlutterImageConversion>(),
+    );
   });
 
   test('getPlatformVersion', () async {

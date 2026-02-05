@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_image_conversion/flutter_image_conversion.dart';
 import 'package:flutter_image_conversion/flutter_image_conversion_platform_interface.dart';
@@ -22,7 +23,8 @@ class MockWebPlatform
   Future<File> convertHeicToJpeg(File file) async {
     // Simulate web behavior: HEIC files get converted (new blob URL path),
     // non-HEIC files are returned as-is
-    final isHeic = file.path.toLowerCase().contains('.heic') ||
+    final isHeic =
+        file.path.toLowerCase().contains('.heic') ||
         file.path.toLowerCase().contains('.heif');
 
     if (!isHeic) {
@@ -31,6 +33,12 @@ class MockWebPlatform
 
     // Simulate successful conversion returning a blob URL
     return File('blob:http://localhost/converted-jpeg');
+  }
+
+  @override
+  Future<Uint8List> convertHeicToJpegBytes(Uint8List bytes) async {
+    // Simulate web behavior: return bytes as-is
+    return bytes;
   }
 }
 
@@ -45,6 +53,12 @@ class MockWebPlatformWithConversionFailure
   Future<File> convertHeicToJpeg(File file) async {
     // Simulate web behavior on conversion failure: return original file
     return file;
+  }
+
+  @override
+  Future<Uint8List> convertHeicToJpegBytes(Uint8List bytes) async {
+    // Simulate web behavior on conversion failure: return original bytes
+    return bytes;
   }
 }
 
