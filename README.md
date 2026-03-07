@@ -9,7 +9,7 @@ Supports iOS, macOS, and Web with full conversion, plus Android and Windows with
 |----------|--------|----------------|------------|-------|
 | **iOS** | ✅ Full | Swift (UIImage) | HEIC → JPEG | Resize + compression |
 | **macOS** | ✅ Full | Swift (NSImage) | HEIC → JPEG | Resize + compression |
-| **Web** | ✅ Full | Dart + JS (heic2any) | HEIC → JPEG | Browser-based WASM |
+| **Web** | ✅ Full | Dart + JS (heic2any) | HEIC → JPEG | WASM compatible |
 | **Android** | ⚠️ Stub | Kotlin | Returns original | Logs warning |
 | **Windows** | ⚠️ Stub | C++ | Returns original | Logs warning |
 
@@ -20,6 +20,7 @@ Supports iOS, macOS, and Web with full conversion, plus Android and Windows with
 - ✅ Adjustable compression quality (default: 0.7)
 - ✅ Multi-platform support (iOS, macOS, Web, Android, Windows)
 - ✅ Graceful fallback on unsupported platforms
+- ✅ WASM compatible (`flutter build web --wasm`)
 - ✅ Comprehensive test coverage
 
 ## Installation
@@ -37,7 +38,7 @@ Or from pub.dev (once published):
 
 ```yaml
 dependencies:
-  flutter_image_conversion: ^2.0.0
+  flutter_image_conversion: ^2.2.0
 ```
 
 ## Usage
@@ -96,12 +97,14 @@ print('Platform: $version');
 
 ### Web
 - **Technology**: Dart + JavaScript interop with heic2any library
+- **Interop**: Uses `package:web` + `dart:js_interop` (WASM compatible)
 - **Processing**:
   1. Fetch image blob from URL
   2. Convert using heic2any (WASM-based)
   3. Create object URL for converted blob
   4. Return File with blob URL
 - **Browser Support**: All modern browsers with WASM support
+- **Build**: Supports both `flutter build web` and `flutter build web --wasm`
 - **Fallback**: Returns original file if conversion fails
 
 ### Android & Windows

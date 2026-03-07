@@ -1,3 +1,23 @@
+## 2.2.0
+
+**Feature: WASM Compatibility**
+
+### Breaking Changes (Web internals only)
+- Migrated Web implementation from `dart:html` to `package:web` + `dart:js_interop`
+- Now fully compatible with `flutter build web --wasm`
+
+### Changes
+- Replaced `dart:html` imports with `package:web/web.dart`
+- Replaced `html.Blob`, `html.Url`, `html.FileReader` with `web.Blob`, `web.URL`, `web.Response` APIs
+- Simplified blob-to-bytes conversion using `Response.arrayBuffer()` instead of `FileReader`
+- Added `web: ^1.1.1` dependency
+
+### Notes
+- No public API changes — existing code works without modification
+- All 11 tests passing
+
+---
+
 ## 2.1.2
 
 **Patch Release: Fix Web Bytes Conversion Bug**
