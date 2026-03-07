@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:js_interop';
-import 'dart:typed_data';
-import 'dart:html' as html;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:web/web.dart' as web;
+
 import 'flutter_image_conversion_platform_interface.dart';
 
 class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
@@ -20,8 +21,8 @@ class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
   @override
   Future<File> convertHeicToJpeg(File file) async {
     try {
-      final response = await html.window.fetch(file.path);
-      final blob = await response.blob();
+      final response = await web.window.fetch(file.path.toJS).toDart;
+      final blob = await response.blob().toDart;
 
       final isHeic =
           blob.type.toLowerCase().contains('heic') ||
@@ -34,11 +35,13 @@ class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
       }
 
       final convertedBlob = await _convertHeicBlob(blob);
-      final objectUrl = html.Url.createObjectUrlFromBlob(convertedBlob);
+      final objectUrl = web.URL.createObjectURL(convertedBlob);
 
       return File(objectUrl);
     } catch (e) {
-      print('[FlutterImageConversion] Web conversion failed: $e');
+      if (kDebugMode) {
+        print('[FlutterImageConversion] Web conversion failed: $e');
+      }
       return file;
     }
   }
@@ -50,34 +53,17 @@ class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
 
     try {
       // Providing a MIME type helps libraries that check blob.type.
-      final blob = html.Blob(<Object>[bytes], 'image/heic');
+      final blob = web.Blob(
+        [bytes.toJS].toJS,
+        web.BlobPropertyBag(type: 'image/heic'),
+      );
 
       final convertedBlob = await _convertHeicBlob(blob);
 
-      final reader = html.FileReader();
-      reader.readAsArrayBuffer(convertedBlob);
-      await reader.onLoadEnd.first;
-
-      final error = reader.error;
-      if (error != null) {
-        throw StateError('FileReader failed: $error');
-      }
-
-      final result = reader.result;
-
-      if (result is ByteBuffer) {
-        // Most correct/efficient: zero-copy view onto the ArrayBuffer.
-        return result.asUint8List();
-      }
-
-      // Some interop paths can produce Uint8List directly.
-      if (result is Uint8List) {
-        return result;
-      }
-
-      throw StateError(
-        'Unexpected FileReader.result type: ${result.runtimeType}',
-      );
+      // Use Response API to read blob bytes (simpler than FileReader).
+      final response = web.Response(convertedBlob);
+      final arrayBuffer = await response.arrayBuffer().toDart;
+      return arrayBuffer.toDart.asUint8List();
     } catch (e) {
       // Best-effort fallback: leave bytes unchanged if conversion fails.
       // ignore: avoid_print
@@ -125,7 +111,7 @@ class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
     return false;
   }
 
-  Future<html.Blob> _convertHeicBlob(html.Blob heicBlob) async {
+  Future<web.Blob> _convertHeicBlob(web.Blob heicBlob) async {
     final options =
         <String, dynamic>{
               'blob': heicBlob,
@@ -137,7 +123,7 @@ class FlutterImageConversionWeb extends FlutterImageConversionPlatform {
     final promise = heic2any(options);
     final result = await promise.toDart;
 
-    return result as html.Blob;
+    return result as web.Blob;
   }
 }
 
