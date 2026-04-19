@@ -6,9 +6,9 @@
 
 #include "generated_plugin_registrant.h"
 
-#include <flutter_image_conversion/flutter_image_conversion_plugin.h>
+#include <flutter_image_conversion/flutter_image_conversion_plugin_c_api.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
-  FlutterImageConversionPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FlutterImageConversionPlugin"));
+  FlutterImageConversionPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FlutterImageConversionPluginCApi"));
 }

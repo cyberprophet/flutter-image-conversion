@@ -3,7 +3,7 @@ description: >
   A lightweight Flutter plugin that enables conversion of HEIC images to JPEG format on iOS, macOS, and Web.
   Supports Windows and Android with graceful fallback. Ideal for apps targeting image uploads, social sharing, or cross-platform compatibility.
 
-version: 2.2.0
+version: 2.2.1
 homepage: https://github.com/cyberprophet/flutter-image-conversion
 
 environment:
@@ -34,7 +34,7 @@ flutter:
       macos:
         pluginClass: FlutterImageConversionPlugin
       windows:
-        pluginClass: FlutterImageConversionPlugin
+        pluginClass: FlutterImageConversionPluginCApi
       web:
         pluginClass: FlutterImageConversionWeb
         fileName: flutter_image_conversion_web.dart

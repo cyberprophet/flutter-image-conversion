@@ -1,3 +1,18 @@
+## 2.2.1
+
+**Patch Release: Fix Windows Build Failure**
+
+### Bug Fixes
+- Fixed `flutter build windows` failure in downstream projects depending on `flutter_image_conversion`
+  - Windows plugin is implemented with the C API pattern (exposes `FlutterImageConversionPluginCApiRegisterWithRegistrar` via `include/flutter_image_conversion/flutter_image_conversion_plugin_c_api.h`), but `pubspec.yaml` declared `pluginClass: FlutterImageConversionPlugin`, causing Flutter's tool to generate `generated_plugin_registrant.cc` that referenced a non-existent header and an undefined register function.
+  - Changed Windows `pluginClass` from `FlutterImageConversionPlugin` to `FlutterImageConversionPluginCApi` so the generated registrant correctly includes `flutter_image_conversion_plugin_c_api.h` and calls `FlutterImageConversionPluginCApiRegisterWithRegistrar`.
+
+### Notes
+- No source code changes; `pubspec.yaml` manifest fix only.
+- Fixes #6.
+
+---
+
 ## 2.2.0
 
 **Feature: WASM Compatibility**
